@@ -71,6 +71,15 @@ class MainApplication(tk.Frame):
         self.tokenStorage = tk.StringVar()
         self.messageStorage = tk.StringVar()
 
+        tk.Grid.rowconfigure(self, 0, weight=1)
+        tk.Grid.columnconfigure(self, 0, weight=1)
+
+        self.times = self.get_times_list()
+        self.startStorage.set(self.times[0])
+        self.endStorage.set(self.times[-1])
+        self.buttonStorage.set("Open History")
+        self.pauseStorage.set("Pause")
+
         tk.Label(self, text="Token:", anchor="w").grid(row=0, column=0, sticky="we")
         tk.Entry(self, textvariable=self.tokenStorage).grid(row=0, column=1, sticky="we")
 
@@ -121,6 +130,11 @@ class MainApplication(tk.Frame):
         print("Active threads:", threading.active_count())
         if threading.active_count() > 1:
             self.popup("Error", "Program already running")
+        else:
+            s = threading.Thread(target=self.start_thread)
+            s.daemon = True
+            s.start()
+            print("[INFO] Thread started.")
         threading.Thread(target=self.save_state).start()
 
     def start_thread(self):
@@ -183,6 +197,19 @@ class MainApplication(tk.Frame):
     def open_link(self, link):
         print(f"Opening link: {link}")
         webbrowser.open_new(link)
+
+    def interrupt(self):
+        try:
+            client.paused = not client.paused
+            self.pauseStorage.set("Play" if client.paused else "Pause")
+        except AttributeError:
+            self.popup("Error", "Bot not started yet.")
+
+    def popup(self, title, msg):
+        showinfo(title, msg)
+
+    def question_popup(self, title, msg):
+        return askquestion(title, msg, icon="warning")
 
 
 if __name__ == "__main__":
