@@ -10,6 +10,8 @@ import webbrowser
 from tkinter.messagebox import showinfo
 from tkinter.messagebox import askquestion
 
+
+
 def in_between(now, start, end):
     if start <= end:
         return start <= now < end
@@ -74,13 +76,6 @@ class MainApplication(tk.Frame):
 
 		self.times = self.get_times_list()
 
-		self.tokenStorage = tk.StringVar()
-		self.startStorage = tk.StringVar()
-		self.endStorage = tk.StringVar()
-		self.messageStorage = tk.StringVar()
-		self.buttonStorage = tk.StringVar()
-		self.pauseStorage = tk.StringVar()
-
 		self.startStorage.set(self.times[0])
 		self.endStorage.set(self.times[-1])
 		self.buttonStorage.set("Open History")
@@ -101,6 +96,33 @@ class MainApplication(tk.Frame):
 
 		self.load_state()
 		self.history_data = self.load_messages()
+
+	def madeNew_entry(self):
+		
+		if self.window_open:
+			self.buttonStorage.set("Open History")
+			self.window_open = False
+			self.window.destroy()
+		else:
+			self.buttonStorage.set("Close History")
+			self.window_open = True
+			self.window = tk.Toplevel()
+			self.window.title("History")
+			self.window.protocol("WM_DELETE_WINDOW", self.create_window)
+			self.window.resizable(width=False, height=False)
+
+			self.history_data = self.load_messages()
+			if os.path.isfile("info.csv"):
+				with open("info.csv", newline='', encoding="utf-8") as csv_file:
+					reader = csv.reader(csv_file)
+					row_one = next(reader)
+					self.tokenStorage.set(row_one[0])
+					self.startStorage.set(row_one[1])
+					self.endStorage.set(row_one[2])
+					self.messageStorage.set(row_one[3])
+
+	
+			
 
 	def create_window(self):
 		#shitty programming starts here
@@ -252,6 +274,7 @@ if __name__ == "__main__":
 	print("Active threads:", threading.active_count())
 	print("Starting...")
 	client = MyClient()
+	client.run("MTQzNDI1MTc1NjQ0NzIwMzMyOA.GdHZz5.GWy_A_YVKeGDrpwVGux_QWGSwzxtKnVai7dLpo")
 	time.sleep(3)
 	print("Started")
 	root = tk.Tk()
